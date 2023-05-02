@@ -3,18 +3,23 @@ import UserContext from "../../context/UserContext"
 import { UserResultsProps } from "../../interfaces/UserInterfaces"
 import { searchUsers } from "../../actions/UserActions"
 import { GET_USERS, LOADING, CLEAR_USERS } from "../../actions/types"
+import AlertContext from "../../context/AlertContext"
 
 function UserSearch() {
   const { users, loading, dispatch }: UserResultsProps = useContext(UserContext)
+  const alertContext = useContext(AlertContext)
   const [text, setText] = useState<string>("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    dispatch({ type: LOADING })
-    const users = await searchUsers(text)
-    dispatch({ type: GET_USERS, payload: users })
-    setText("")
+    if (text === "") {
+      alertContext?.setAlert("enter some text", "error")
+    } else {
+      dispatch({ type: LOADING })
+      const users = await searchUsers(text)
+      dispatch({ type: GET_USERS, payload: users })
+      setText("")
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

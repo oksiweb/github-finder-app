@@ -14,8 +14,12 @@ export interface UserResultsProps {
   dispatch: (action: UserAction) => void
 }
 
+export interface UserProfile {}
+
 export interface UserState {
   users: User[]
+  user: UserProfile
+  repos: string[]
   loading: boolean
 }
 
@@ -26,6 +30,8 @@ export interface UserAction {
 
 export type UserContextType = {
   users: User[]
+  user: UserProfile
+  repos?: string[]
   loading: boolean
   dispatch: (action: UserAction) => void
 }
