@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback } from "react"
+import { useState, useContext } from "react"
 import UserContext from "../../context/UserContext"
 import { UserResultsProps } from "../../interfaces/UserInterfaces"
 import { searchUsers } from "../../actions/UserActions"
@@ -11,14 +11,11 @@ function UserSearch() {
   const alertContext = useContext(AlertContext)
   const [text, setText] = useState<string>("")
 
-  const delayedSearchUsers = useCallback(
-    debounce(async (searchText: string) => {
-      dispatch({ type: LOADING })
-      const users = await searchUsers(searchText)
-      dispatch({ type: GET_USERS, payload: users })
-    }, 500),
-    [dispatch]
-  )
+  const delayedSearchUsers = debounce(async (searchText: string) => {
+    dispatch({ type: LOADING })
+    const users = await searchUsers(searchText)
+    dispatch({ type: GET_USERS, payload: users })
+  }, 500)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

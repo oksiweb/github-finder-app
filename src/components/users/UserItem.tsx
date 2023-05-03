@@ -5,7 +5,6 @@ function UserItem({ user }: UserItemProps) {
   if (!user) {
     return <div>User not found</div>
   }
-  console.log(user, "item")
   const { login, avatar_url } = user
   return (
     <div className="card shadow-md compact side bg-base-100">
