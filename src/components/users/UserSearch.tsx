@@ -1,29 +1,47 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useCallback } from "react"
 import UserContext from "../../context/UserContext"
 import { UserResultsProps } from "../../interfaces/UserInterfaces"
 import { searchUsers } from "../../actions/UserActions"
 import { GET_USERS, LOADING, CLEAR_USERS } from "../../actions/types"
 import AlertContext from "../../context/AlertContext"
+import { debounce } from "../../utils/helpers"
 
 function UserSearch() {
   const { users, loading, dispatch }: UserResultsProps = useContext(UserContext)
   const alertContext = useContext(AlertContext)
   const [text, setText] = useState<string>("")
 
+  const delayedSearchUsers = useCallback(
+    debounce(async (searchText: string) => {
+      dispatch({ type: LOADING })
+      const users = await searchUsers(searchText)
+      dispatch({ type: GET_USERS, payload: users })
+    }, 500),
+    []
+  )
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (text === "") {
       alertContext?.setAlert("enter some text", "error")
     } else {
-      dispatch({ type: LOADING })
-      const users = await searchUsers(text)
-      dispatch({ type: GET_USERS, payload: users })
-      setText("")
+      delayedSearchUsers(text)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value)
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchQuery = e.target.value
+    setText(searchQuery)
+    if (searchQuery === "") {
+      alertContext?.setAlert("enter some text", "error")
+    } else {
+      delayedSearchUsers(searchQuery)
+    }
+  }
+
+  const handleClearSearch = () => {
+    setText("")
+    dispatch({ type: CLEAR_USERS })
   }
 
   return (
@@ -42,7 +60,7 @@ function UserSearch() {
       </div>
       {users.length > 0 && (
         <div>
-          <button onClick={() => dispatch({ type: CLEAR_USERS })} className="btn btn-ghost btn-lg">
+          <button onClick={handleClearSearch} className="btn btn-ghost btn-lg">
             Clear
           </button>
         </div>
