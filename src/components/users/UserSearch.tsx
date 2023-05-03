@@ -17,7 +17,7 @@ function UserSearch() {
       const users = await searchUsers(searchText)
       dispatch({ type: GET_USERS, payload: users })
     }, 500),
-    []
+    [dispatch]
   )
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
